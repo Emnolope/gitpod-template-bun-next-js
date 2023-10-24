@@ -3,16 +3,19 @@ image: gitpod/workspace-bun
 tasks:
   - name: Init a bun project and run
     init: |
-      # Init a project if needed
-      if test ! -e package.json; then {
-        bun init -y
-      } fi
-      # Install dependencies
+      if test ! -e package.json; then
+        TMP_DIR=$(mktemp -d)
+        shopt -s dotglob
+        mv * $TMP_DIR/
+        bun create --no-git next-app .
+        cp -r $TMP_DIR/* ./
+        rm -r $TMP_DIR
+        shopt -u dotglob
+      fi
       bun install
-      
     command: |
-      # Run project
-      bun run index.ts
+      bun upgrade --canary
+      bun dev
 
 ports:
   - port: 3000
